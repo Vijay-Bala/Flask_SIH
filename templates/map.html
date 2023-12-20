@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>GIS MAPPING FOR PIPELINES</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0; /* Updated background color */
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand,
+        .navbar-nav a {
+            color: #ffffff !important;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .navbar-nav a::after {
+            content: "";
+            display: block;
+            height: 2px;
+            background-color: #ffffff;
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .navbar-nav a:hover::after {
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding: 20px;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        #map {
+            height: 500px;
+            border: 2px solid #3498db; /* Updated border color */
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease-in-out;
+            background-color: #ecf0f1; /* Updated background color */
+        }
+
+        .btn-group {
+            margin-top: 10px;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        .btn-group button {
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-group button:hover {
+            background-color: #2ecc71; /* Updated hover color */
+        }
+
+        .esri-zoom {
+            display: none !important;
+        }
+
+        .esri-attribution,
+        .esri-component.esri-attribution {
+            display: none !important;
+        }
+
+        .dashboard-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #27ae60; /* Updated background color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dashboard-button:hover {
+            background-color: #219a52; /* Updated hover color */
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 4px;
+            }
+
+            .navbar-brand,
+            .navbar-nav a {
+                font-size: 14px;
+            }
+
+            .container-fluid {
+                padding: 10px;
+            }
+
+            #map {
+                height: 300px;
+                margin-bottom: 10px;
+            }
+
+            .btn-group {
+                margin-top: 5px;
+            }
+
+            .btn-group button {
+                margin-right: 5px;
+            }
+
+            .dashboard-button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">TYPHON</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Map Page</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://127.0.0.1:5000/main.html">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <h1 class="mb-4 text-center">GIS MAPPING FOR PIPELINES</h1>
+
+        <div class="card" style="animation: fadeInUp 1s ease-in-out;">
+            <div class="card-body">
+                <div id="map"></div>
+                <button id="addNodeBtn" class="btn btn-primary">Add Node</button>
+                <div class="btn-group">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.arcgis.com/4.25/"></script>
+    <script>
+        require([
+            'esri/Map',
+            'esri/views/MapView',
+            'esri/Graphic',
+            'esri/geometry/Point',
+            'esri/symbols/SimpleMarkerSymbol',
+            'esri/geometry/Polyline',
+            'esri/layers/GraphicsLayer',
+            'esri/PopupTemplate'
+        ], function (Map, MapView, Graphic, Point, SimpleMarkerSymbol, Polyline, GraphicsLayer, PopupTemplate) {
+            var map = new Map({
+                basemap: 'streets'
+            });
+
+            var view = new MapView({
+                container: 'map',
+                map: map,
+                center: [77.9812, 10.3598],
+                zoom: 15
+            });
+
+            var pointSymbol = new SimpleMarkerSymbol({
+                color: [226, 119, 40],
+                outline: {
+                    color: [255, 255, 255],
+                    width: 2
+                },
+                size: 10
+            });
+
+            var polylineSymbol = {
+                type: 'simple-line',
+                color: [0, 0, 255],
+                width: 2
+            };
+
+            var pointGraphicsLayer = new GraphicsLayer();
+            var polylineGraphicsLayer = new GraphicsLayer();
+
+            map.addMany([pointGraphicsLayer, polylineGraphicsLayer]);
+
+            document.getElementById('addNodeBtn').addEventListener('click', function () {
+                var latitude = prompt('Enter Latitude:');
+                var longitude = prompt('Enter Longitude:');
+                var nodeName = prompt('Enter Node Name or ID:');
+
+                if (latitude && longitude && !isNaN(parseFloat(latitude)) && !isNaN(parseFloat(longitude))) {
+                    var [pointGraphic, textGraphic] = createPointGraphic({ longitude: parseFloat(longitude), latitude: parseFloat(latitude), name: nodeName });
+
+                    if (pointGraphicsLayer.graphics.length > 0) {
+                        var previousPoint = pointGraphicsLayer.graphics.getItemAt(pointGraphicsLayer.graphics.length - 1).geometry;
+                        var polyline = createPolylineGraphic([
+                            [previousPoint.longitude, previousPoint.latitude],
+                            [parseFloat(longitude), parseFloat(latitude)]
+                        ]);
+                        polylineGraphicsLayer.add(polyline);
+
+                        if (polylineGraphicsLayer.graphics.length === 1) {
+                            polyline.popupTemplate = new PopupTemplate({
+                                title: 'Go to dashboard',
+                                content: '<a href="http://127.0.0.1:5000/main.html">Go to dashboard</a>'
+                            });
+                        } else {
+                            polyline.popupTemplate = new PopupTemplate({
+                                title: 'Go to dashboard',
+                                content: '<a href="http://127.0.0.1:5000/main2.html">Go to dashboard</a>'
+                            });
+                        }
+                    }
+
+                    pointGraphicsLayer.addMany([pointGraphic, textGraphic]);
+                } else {
+                    alert('Invalid Latitude or Longitude.');
+                }
+            });
+
+            function createPointGraphic(point) {
+                var pointGeometry = new Point({
+                    longitude: point.longitude,
+                    latitude: point.latitude
+                });
+
+                var pointGraphic = new Graphic({
+                    geometry: pointGeometry,
+                    symbol: pointSymbol,
+                    attributes: { name: point.name }
+                });
+
+                var textSymbol = {
+                    type: 'text',
+                    color: [0, 0, 0],
+                    haloColor: [255, 255, 255],
+                    haloSize: 1,
+                    text: point.name,
+                    xoffset: 0,
+                    yoffset: -15,
+                    font: {
+                        size: 10,
+                        weight: 'bold'
+                    }
+                };
+
+                var textGraphic = new Graphic({
+                    geometry: pointGeometry,
+                    symbol: textSymbol
+                });
+
+                return [pointGraphic, textGraphic];
+            }
+
+            function createPolylineGraphic(paths) {
+                var polylineGeometry = new Polyline({
+                    paths: paths
+                });
+
+                var polylineGraphic = new Graphic({
+                    geometry: polylineGeometry,
+                    symbol: polylineSymbol
+                });
+
+                return polylineGraphic;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Leak Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .big-div {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .big-div h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .big-div-content {
+            font-size: 18px;
+        }
+
+        .bar-chart-container {
+            margin-top: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .animated {
+            animation-duration: 1s;
+        }
+
+        .fadeInUp {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .fadeInUp.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fadeInLeft {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .fadeInLeft.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .fadeInRight {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .fadeInRight.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .fadeIn {
+            opacity: 0;
+        }
+
+        .fadeIn.animated {
+            opacity: 1;
+        }
+
+        .fadeInDown {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .fadeInDown.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .professional {
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container text-center mt-3">
+        <h1 style="color: #007bff;" class="fadeInDown animated">Leak Information</h1>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="big-div professional fadeInLeft" id="leakTypeDiv">
+                    <h2>Leak Type</h2>
+                    <div id="leakType" class="big-div-content">Seal Leakage</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="big-div professional fadeInRight" id="crackTypeDiv">
+                    <h2>Crack Type</h2>
+                    <div id="crackType" class="big-div-content">Surface Crack</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="big-div professional fadeInLeft" id="anoTypeDiv">
+                    <h2>Anomaly Detected</h2>
+                    <div id="anoType" class="big-div-content">True</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="big-div professional fadeInRight" id="totalFlowDiv">
+                    <h2>Total Water Flow</h2>
+                    <div id="totalFlow" class="big-div-content">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="bar-chart-container fadeInUp animated">
+                    <h2 class="text-center mt-3">Daily Water Flow and Loss</h2>
+                    <canvas id="barChart" width="800" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData(url) {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+    
+        async function updateData() {
+            // Get random values for Leak Type and Crack Type
+            const leakType = "Seal Leakage";
+            const crackType = "Surface Crack";
+    
+            // Update Leak Type and Crack Type with animations
+            document.getElementById('leakType').innerText = leakType;
+            document.getElementById('leakTypeDiv').classList.add('animated');
+            document.getElementById('leakTypeDiv').classList.add('fadeInLeft');
+    
+            document.getElementById('crackType').innerText = crackType;
+            document.getElementById('crackTypeDiv').classList.add('animated');
+            document.getElementById('crackTypeDiv').classList.add('fadeInRight');
+    
+            // Update Anomaly Detected with animations
+            document.getElementById('anoType').innerText = 'True';
+            document.getElementById('anoTypeDiv').classList.add('animated');
+            document.getElementById('anoTypeDiv').classList.add('fadeInLeft');
+    
+            // Fetch data from the API and calculate total water flow
+            const flow2Data = await fetchData('http://127.0.0.1:5000/api/flow/f2');
+            const totalFlow = flow2Data.reduce((total, point) => total + point.value, 0);
+    
+            // Update Total Water Flow with animations
+            document.getElementById('totalFlow').innerText = totalFlow.toFixed(4);
+            document.getElementById('totalFlowDiv').classList.add('animated');
+            document.getElementById('totalFlowDiv').classList.add('fadeInRight');
+    
+            // Generate random data inputs for the bar chart
+            const randomData = generateRandomBarChartData(10);
+    
+            // Update bar chart data
+            updateBarChart(randomData);
+        }
+    
+        function generateRandomBarChartData(count) {
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - count + 1);
+    
+            const randomData = [];
+            for (let i = 0; i < count; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+    
+                const totalFlowValue = Math.random() * 50 + 50; // Random value between 50 and 100
+                let totalLossValue = 0;
+    
+                // Generate red bars with a probability of 0.33
+                if (Math.random() < 0.33) {
+                    totalLossValue = Math.random() * totalFlowValue * 0.1; // 10% of totalFlow
+                }
+    
+                randomData.push({
+                    date: date.toISOString().slice(0, 10),
+                    totalFlow: totalFlowValue.toFixed(2),
+                    totalLoss: totalLossValue.toFixed(2),
+                });
+            }
+    
+            return randomData;
+        }
+    
+        function updateBarChart(barChartData) {
+            const dates = barChartData.map(point => point.date);
+            const totalFlowValues = barChartData.map(point => point.totalFlow);
+            const totalLossValues = barChartData.map(point => point.totalLoss);
+    
+            const ctxBarChart = document.getElementById('barChart').getContext('2d');
+            const barChart = new Chart(ctxBarChart, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Total Water Flow',
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            data: totalFlowValues,
+                        },
+                        {
+                            label: 'Total Water Loss',
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            data: totalLossValues,
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                        },
+                    },
+                },
+            });
+        }
+    
+        // Example: Call the function to update data initially
+        updateData();
+    
+        // Set up a timer to periodically update the data (adjust the interval as needed)
+        setInterval(updateData, 10000); // Update every 10 seconds
+    </script>
+    
+    
+</body>
+
+</html>

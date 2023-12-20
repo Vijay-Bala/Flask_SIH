@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #56baed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #loginForm {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* animation: pulse 1.5s ease-in-out; */
+            /* animation: rotateColorScale 1s ease-in-out ; */
+            width: 300px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        /* input {
+            animation: rotateColorScale 3s ease-in-out;
+        } */
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            /* animation: rotateColorScale 3s ease-in-out; */
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes rotateColorScale {
+            0% {
+                transform: rotate(0deg) scale(1);
+                /* background-color: #007bff; */
+                opacity: 0;
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1);
+                /* background-color: #007bff; */
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loginForm">
+        <h2>Login</h2>
+        <form id="form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Check credentials
+            if (username === 'admin' && password === '1234') {
+                // Redirect to map.html
+                window.location.href = 'http://127.0.0.1:5000/map.html';
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>

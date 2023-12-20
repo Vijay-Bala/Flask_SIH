@@ -1,0 +1,8 @@
+Flask
+Gunicorn
+pandas
+flask_restful  
+flask
+gspread
+oauth2client
+requests
