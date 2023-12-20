@@ -155,7 +155,7 @@
                         <a class="nav-link" href="#">Map Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://44.226.145.213:5000/main.html">Dashboard</a>
+                        <a class="nav-link" href="/main.html">Dashboard</a>
                     </li>
                 </ul>
             </div>
@@ -237,12 +237,12 @@
                         if (polylineGraphicsLayer.graphics.length === 1) {
                             polyline.popupTemplate = new PopupTemplate({
                                 title: 'Go to dashboard',
-                                content: '<a href="http://44.226.145.213:5000/main.html">Go to dashboard</a>'
+                                content: '<a href="/main.html">Go to dashboard</a>'
                             });
                         } else {
                             polyline.popupTemplate = new PopupTemplate({
                                 title: 'Go to dashboard',
-                                content: '<a href="http://44.226.145.213:5000/main2.html">Go to dashboard</a>'
+                                content: '<a href="/main2.html">Go to dashboard</a>'
                             });
                         }
                     }

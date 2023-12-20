@@ -84,7 +84,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="http://44.226.145.213:5000/map.html">Map Page</a>
+                        <a class="nav-link" href="/map.html">Map Page</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="#">Dashboard</a>
@@ -139,7 +139,7 @@
     </div>
 
     <div class="container text-center mt-3">
-        <a href="http://44.226.145.213:5000/leak.html" class="btn btn-more-info">More info</a>
+        <a href="/leak.html" class="btn btn-more-info">More info</a>
     </div>
 
   <script>
@@ -295,8 +295,8 @@
     let alertShown = false;
 
     async function updateChartData() {
-      const flow1Value = await fetchData('http://44.226.145.213:5000/api/flow/f1');
-      const flow2Value = await fetchData('http://44.226.145.213:5000/api/flow/f2');
+      const flow1Value = await fetchData('/api/flow/f1');
+      const flow2Value = await fetchData('/api/flow/f2');
 
       // Check the difference and display alert if more than 0.9, but only if an alert hasn't been shown recently
       if (!alertShown && Math.abs(flow1Value - flow2Value) > 0.9) {
