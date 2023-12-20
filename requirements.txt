@@ -6,3 +6,4 @@ flask
 gspread
 oauth2client
 requests
+flask_cors
